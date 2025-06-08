@@ -20,16 +20,6 @@ type                    CommitStatus             uint16 ;
 
 type                    CommitHandler            func ( *CommitRequest , *CommitResponse ) CommitStatus ; 
 
-type     Test         struct {
-    Hint2              uint32             ;   
-    Hint3              uint8              ;   
-}; 
-
-type     Test2         struct {
-    Hint2              uint32             ;   
-    Hint3              uint32              ;   
-    Hint4              uint32              ;   
-}; 
 
 type     CommitRequest      struct {
     Hint              RoleHint           ;   // 1
@@ -170,11 +160,14 @@ func EndSession(req_buffer *CommitRequest , resp_buffer *CommitResponse) CommitS
 
 func ReprPadding( value interface{} ) { // Why shtty align of non-power of 2. keep it @ 2^x
   t := reflect.TypeOf(value) ; 
-  for i := 0 ; i < t.NumField() - 1 ; i++ {
-    if t.Field(i + 1 ).Offset > t.Field(i).Type.Size() {
-      fmt.Print("Padding was added")
-    }
+  for i := t.NumField() - 1 ; i >= 0 ; i-- {
+    // if t.Field(i + 1 ).Offset > t.Field(i).Type.Size() {
+    //   fmt.Print("Padding was added")
+    // }
+
+    fmt.Println(t.Field(i).Type.Size()) ;
   }
+  fmt.Printf("Size: %v\n", reflect.TypeOf(value).Size()) ;  
 }
 
 func alignment_as_int(uip uintptr) int {

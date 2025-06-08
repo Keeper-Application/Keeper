@@ -8,6 +8,6 @@ import (
 
 
 func main(){
-  var x commit.Test2 ; 
+  var x commit.CommitRequest; 
   commit.ReprPadding(x) ; 
 }
