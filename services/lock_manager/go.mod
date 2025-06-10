@@ -1,4 +1,4 @@
-module keeper/services/lock_manager
+module github.com/keeper/services/lock_manager
 
 go 1.23.4
 

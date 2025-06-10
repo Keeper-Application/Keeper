@@ -2,9 +2,12 @@ package commit
 
 import (
 	"fmt"
+	"net"
 	"reflect"
 	"time"
-	pb "keeper/services/session_manager/sessionpb"
+	pb "github.com/keeper/services/session_manager/sessionpb"
+	"google.golang.org/grpc"
+	"log"
 )
 
 
@@ -150,5 +153,28 @@ func EndSession(req_buffer *CommitRequest , resp_buffer *CommitResponse) CommitS
   fmt.Println( " Hello from commit " ); 
   return S_Ok  
 }
+
+func StartServer(port string) error {
+
+	lis, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		return fmt.Errorf("failed to listen on port %s: %v", port, err)
+	}
+
+	grpcServer := grpc.NewServer()
+	sessioManagerServer := SessionManagerServer{} ; 
+	
+	pb.RegisterSessionManagerServer(grpcServer, sessioManagerServer)
+	
+	log.Printf("gRPC server listening on port %s", port)
+	log.Println("Server starting...")
+	
+	if err := grpcServer.Serve(lis); err != nil {
+		return fmt.Errorf("failed to serve on port: %v", port, err)
+	}
+	
+	return nil
+}
+
 
 

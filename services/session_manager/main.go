@@ -9,12 +9,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	// "keeper/services/session_manager/commit"
-	// "keeper/services/lock_manager/issuelock"                   
-	pb "keeper/services/lock_manager/lockpb"                    // For protobuf types
+	"github.com/keeper/services/session_manager/commit"
+	pb "github.com/keeper/services/lock_manager/lockpb"                    // For protobuf types
 )
 
-func main() {
+func BeginClient() {
 	// Create gRPC client connection
 	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -41,4 +40,8 @@ func main() {
 	} else {
 		fmt.Printf("Lock status response: %s\n", response.GetResponse())
 	}
+}
+
+func main() {
+	commit.StartServer("5051");
 }
