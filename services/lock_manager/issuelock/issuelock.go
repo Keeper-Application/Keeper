@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"syn"
+	"sync"
 
 	"google.golang.org/grpc"
-	pb "keeper/services/lock_manager/lockpb"  // Import the generated protobuf code
+	pb "github.com/keeper/services/lock_manager/lockpb"  // Import the generated protobuf code
 )
 
 func Greeting() {

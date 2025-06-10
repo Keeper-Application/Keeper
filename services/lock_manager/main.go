@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"keeper/services/lock_manager/issuelock"
+	"github.com/keeper/services/lock_manager/issuelock"
 )
 
 func main() {

@@ -11,7 +11,7 @@ import (
 
 	// "keeper/services/session_manager/commit"
 	// "keeper/services/lock_manager/issuelock"                   
-	pb "keeper/services/lock_manager/lockpb"                    // For protobuf types
+	pb "github.com/keeper/services/lock_manager/lockpb"                    // For protobuf types
 )
 
 func main() {
