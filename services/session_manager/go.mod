@@ -5,12 +5,12 @@ go 1.23.4
 toolchain go1.24.4
 
 require (
-	github.com/keeper/services/lock_manager v0.0.0
 	google.golang.org/grpc v1.73.0
 	google.golang.org/protobuf v1.36.6
 )
 
 replace github.com/keeper/services/lock_manager => ../lock_manager
+
 
 require (
 	golang.org/x/net v0.38.0 // indirect
