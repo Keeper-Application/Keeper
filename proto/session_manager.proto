@@ -1,0 +1,75 @@
+syntax = "proto3" ; 
+option go_package = "services/session_manager/sessionpb;commit"; 
+
+service SessionManager {
+  rpc CreateSession(CommitRequest)  returns  (CommitResponse);
+  rpc UpdateSession(CommitRequest)  returns  (CommitResponse);
+  rpc BeginSession(CommitRequest)   returns  (CommitResponse);
+  rpc EndSession(CommitRequest)     returns  (CommitResponse);
+  rpc DeleteSession(CommitRequest)  returns  (CommitResponse);
+  rpc SuspendSession(CommitRequest) returns  (CommitResponse);
+}
+
+message Session {
+
+  enum SessionType {
+
+      SESSION_TYPE_UNDEFINED                     = 0 ;           // fallback/default
+      SESSION_TYPE_TIME_BOUND                    = 1 ;           // e.g. 3pm–5pm, recurring 
+      SESSION_TYPE_GOAL_BASED                    = 2 ;           // e.g. complete a checklist, task, or app usage limit
+      SESSION_TYPE_APP_SPECIFIC                  = 3 ;           // block apps until specific apps are used (e.g. Duolingo)
+      SESSION_TYPE_SCREEN_TIME_BUDGET            = 4 ;           // session ends when a time budget is exhausted (e.g. 60 minutes of YouTube)
+      SESSION_TYPE_LOCATION_BASED                = 5 ;           // triggered only in specific geofenced areas (school, library)
+      SESSION_TYPE_DAILY_RECURRING               = 6 ;           // scheduled daily lock window (e.g. every day 10pm–7am)
+      SESSION_TYPE_ONE_TIME_CHALLENGE            = 7 ;           // Guardian sets a single-use challenge (e.g., "1 hour writing")
+
+  }
+
+  enum SessionStatus {
+
+    SESSION_STATUS_ERR                           = 0 ;
+    SESSION_STATUS_ACTIVE                        = 1 ;
+    SESSION_STATUS_ENDED                         = 2 ; 
+    SESSION_SUSPENDED                            = 3 ; 
+    SESSION_EXPIRED                              = 4 ; 
+  }
+
+  SessionStatus session_status = 1 ;
+  SessionType   session_type   = 2 ;
+  string        session_id     = 3 ; 
+
+}
+
+
+message CommitRequest {
+
+  enum UserType {
+
+    USER     = 0;
+    GUARDIAN = 1;
+
+  }
+
+  UserType    user_type    = 1; 
+  Session     session_info = 2;
+  string      tenant_id    = 3;
+  string      requestor_id = 4;
+
+}
+
+
+message CommitResponse{
+
+  enum CommitStatus {
+    E_EXISTS                                       = 0 ;
+    E_ACCESS                                       = 1 ; 
+    E_LIMITREACHED                                 = 2 ; 
+    E_INEXISTENT                                   = 3 ; 
+    E_PERMISSION                                   = 4 ; 
+    E_BUSY                                         = 5 ; 
+    S_OK                                           = 6 ; 
+  }
+
+  CommitStatus commit_status  = 1 ; 
+  string       commit_message = 2 ; 
+}

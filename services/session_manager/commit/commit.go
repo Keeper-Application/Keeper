@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"time"
-	// "unsafe"
+	pb "keeper/services/session_manager/sessionpb"
 )
 
 
@@ -112,6 +112,9 @@ var dispatch_map = map[Opcode]CommitHandler{
 */
 
 
+type SessionManagerServer struct {
+	pb.UnimplementedSessionManagerServer ; 
+}
 func CreateSession(req_buffer *CommitRequest , resp_buffer *CommitResponse) CommitStatus {
   var s  CommitRequest ; 
   fmt.Println(reflect.TypeOf(s).Align()) ; 
@@ -148,28 +151,4 @@ func EndSession(req_buffer *CommitRequest , resp_buffer *CommitResponse) CommitS
   return S_Ok  
 }
 
-// Greedy approach 
-// Check size of previous character and alignment of self 
-// alignment = align 
-// everytime we see a type we subtract from the align and go to the next 
-// If the value of the next type would cause us to exceed our alignment add padding and repeat. 
 
-// Suppose Align = 4 & F1 = uint8 that means we subtract 1 and go forward
-// now two cases arise, whether continuing would cause us to overstep our alignment bounds ( given by F + 1 ) case we would have to add padding.
-// or we can continue 
-
-func ReprPadding( value interface{} ) { // Why shtty align of non-power of 2. keep it @ 2^x
-  t := reflect.TypeOf(value) ; 
-  for i := t.NumField() - 1 ; i >= 0 ; i-- {
-    // if t.Field(i + 1 ).Offset > t.Field(i).Type.Size() {
-    //   fmt.Print("Padding was added")
-    // }
-
-    fmt.Println(t.Field(i).Type.Size()) ;
-  }
-  fmt.Printf("Size: %v\n", reflect.TypeOf(value).Size()) ;  
-}
-
-func alignment_as_int(uip uintptr) int {
-    return int(uip)
-}

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "services/lock_manager/issuelock;issuelock";
+
+service LockManager {
+  rpc GetStatus(LockRequest) returns (LockResponse);
+}
+
+message LockRequest {
+  string request = 1;
+}
+
+message LockResponse {
+  string response = 1;
+}
