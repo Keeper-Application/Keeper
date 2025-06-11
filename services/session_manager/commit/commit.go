@@ -6,8 +6,6 @@ import (
 )
 
 
-
-
 type SessionManagerServerImpl struct {
   pb.UnimplementedSessionManagerServer ; 
 }
