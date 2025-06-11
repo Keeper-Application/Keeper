@@ -2,7 +2,7 @@ package commit
 
 import (
 	"context"
-	pb "github.com/keeper/services/session_manager/sessionpb"
+	pb "github.com/keeper/services/session_manager/gen/sessionpb"
 )
 
 

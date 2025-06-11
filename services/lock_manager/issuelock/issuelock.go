@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"google.golang.org/grpc"
-	pb "github.com/keeper/services/lock_manager/lockpb"  // Import the generated protobuf code
+	pb "github.com/keeper/services/lock_manager/gen/lockpb"  
 )
 
 func Greeting() {
