@@ -1,5 +1,5 @@
 syntax = "proto3" ; 
-option go_package = "services/session_manager/sessionpb;commit"; 
+option go_package = "services/session_manager/gen/sessionpb;commit"; 
 
 service SessionManager {
   rpc CreateSession(CommitRequest)  returns  (CommitResponse);
@@ -27,18 +27,22 @@ message Session {
 
   enum SessionStatus {
 
-    SESSION_STATUS_ERR                           = 0 ;
-    SESSION_STATUS_ACTIVE                        = 1 ;
-    SESSION_STATUS_ENDED                         = 2 ; 
-    SESSION_SUSPENDED                            = 3 ; 
-    SESSION_EXPIRED                              = 4 ; 
+    SESSION_STATUS_ERR                          = 0 ;
+    SESSION_STATUS_ACTIVE                       = 1 ;
+    SESSION_STATUS_ENDED                        = 2 ; 
+    SESSION_SUSPENDED                           = 3 ; 
+    SESSION_EXPIRED                             = 4 ; 
+
   }
 
-  SessionStatus session_status = 1 ;
-  SessionType   session_type   = 2 ;
-  string        session_id     = 3 ; 
+  SessionStatus               session_status    = 1 ;
+  SessionType                 session_type      = 2 ;
+  string                      session_id        = 3 ; 
+  string                      guardian_id       = 4 ; 
+  repeated      string        user_id           = 5 ; 
 
 }
+
 
 
 message CommitRequest {

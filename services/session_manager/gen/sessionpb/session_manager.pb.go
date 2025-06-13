@@ -252,6 +252,8 @@ type Session struct {
 	SessionStatus Session_SessionStatus  `protobuf:"varint,1,opt,name=session_status,json=sessionStatus,proto3,enum=Session_SessionStatus" json:"session_status,omitempty"`
 	SessionType   Session_SessionType    `protobuf:"varint,2,opt,name=session_type,json=sessionType,proto3,enum=Session_SessionType" json:"session_type,omitempty"`
 	SessionId     string                 `protobuf:"bytes,3,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	GuardianId    string                 `protobuf:"bytes,4,opt,name=guardian_id,json=guardianId,proto3" json:"guardian_id,omitempty"`
+	UserId        []string               `protobuf:"bytes,5,rep,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -305,6 +307,20 @@ func (x *Session) GetSessionId() string {
 		return x.SessionId
 	}
 	return ""
+}
+
+func (x *Session) GetGuardianId() string {
+	if x != nil {
+		return x.GuardianId
+	}
+	return ""
+}
+
+func (x *Session) GetUserId() []string {
+	if x != nil {
+		return x.UserId
+	}
+	return nil
 }
 
 type CommitRequest struct {
@@ -431,12 +447,15 @@ var File_session_manager_proto protoreflect.FileDescriptor
 
 const file_session_manager_proto_rawDesc = "" +
 	"\n" +
-	"\x15session_manager.proto\"\xbd\x04\n" +
+	"\x15session_manager.proto\"\xf7\x04\n" +
 	"\aSession\x12=\n" +
 	"\x0esession_status\x18\x01 \x01(\x0e2\x16.Session.SessionStatusR\rsessionStatus\x127\n" +
 	"\fsession_type\x18\x02 \x01(\x0e2\x14.Session.SessionTypeR\vsessionType\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x03 \x01(\tR\tsessionId\"\x8f\x02\n" +
+	"session_id\x18\x03 \x01(\tR\tsessionId\x12\x1f\n" +
+	"\vguardian_id\x18\x04 \x01(\tR\n" +
+	"guardianId\x12\x17\n" +
+	"\auser_id\x18\x05 \x03(\tR\x06userId\"\x8f\x02\n" +
 	"\vSessionType\x12\x1a\n" +
 	"\x16SESSION_TYPE_UNDEFINED\x10\x00\x12\x1b\n" +
 	"\x17SESSION_TYPE_TIME_BOUND\x10\x01\x12\x1b\n" +
@@ -479,7 +498,7 @@ const file_session_manager_proto_rawDesc = "" +
 	"\n" +
 	"EndSession\x12\x0e.CommitRequest\x1a\x0f.CommitResponse\x120\n" +
 	"\rDeleteSession\x12\x0e.CommitRequest\x1a\x0f.CommitResponse\x121\n" +
-	"\x0eSuspendSession\x12\x0e.CommitRequest\x1a\x0f.CommitResponseB+Z)services/session_manager/sessionpb;commitb\x06proto3"
+	"\x0eSuspendSession\x12\x0e.CommitRequest\x1a\x0f.CommitResponseB/Z-services/session_manager/gen/sessionpb;commitb\x06proto3"
 
 var (
 	file_session_manager_proto_rawDescOnce sync.Once

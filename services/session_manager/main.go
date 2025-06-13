@@ -4,13 +4,10 @@ import (
 	"fmt"
 	"log"
   "net"
-
 	"google.golang.org/grpc"
+	pb "github.com/keeper/services/session_manager/gen/sessionpb"
+	"github.com/keeper/services/session_manager/commit"         
 
-	// "keeper/services/session_manager/commit"
-	// "keeper/services/lock_manager/issuelock"                   
-	pb "github.com/keeper/services/session_manager/gen/sessionpb"                    // For protobuf types
-	"github.com/keeper/services/session_manager/commit"                    // For protobuf types
 )
 
 

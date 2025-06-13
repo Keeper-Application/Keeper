@@ -6,11 +6,10 @@ import (
 	"log"
 	"time"
 
-	pb "github.com/keeper/services/session_manager/sessionpb"
+	pb "github.com/keeper/services/notifications/gen/sessionpb" // Fix this 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
-
 
 
 func BeginClient(port string) {
@@ -30,14 +29,18 @@ func BeginClient(port string) {
 
 	// Create a lock request
 
+	session_info := &pb.Session{
+		SessionStatus  : pb.Session_SESSION_STATUS_ACTIVE,
+		SessionType    : pb.Session_SESSION_TYPE_DAILY_RECURRING,
+		SessionId      : "826cf6e3-d09a-46f1-9e7c-9d7b3ef3e459",
+		GuardianId     : "dfd5910e-942e-491a-a119-3a9ad60d3422",
+		// UserId         : []string{"02d0f543-b44a-4b88-b8f2-83c1ff5a51ac", "02d0f543-b44a-4b88-b8f2-83c1ff5a51ac", "02d0f543-b44a-4b88-b8f2-83c1ff5a51ac" },
+		UserId         : []string{"02d0f543-b44a-4b88-b8f2-83c1ff5a51ac"},
+	}
 
 	sessionreq := &pb.CommitRequest{
     UserType : pb.CommitRequest_GUARDIAN,
-    SessionInfo : &pb.Session{ 
-      SessionStatus : pb.Session_SESSION_STATUS_ACTIVE,
-      SessionType   : pb.Session_SESSION_TYPE_DAILY_RECURRING,
-      SessionId     : "", 
-    },
+    SessionInfo : session_info,
     TenantId        : "",
     RequestorId     : "",
 	}

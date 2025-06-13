@@ -2,5 +2,6 @@ go 1.23.6
 
 use (
 	./services/lock_manager
+	./services/notifications
 	./services/session_manager
 )
