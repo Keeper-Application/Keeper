@@ -34,8 +34,7 @@ func BeginClient(port string) {
 		SessionType    : pb.Session_SESSION_TYPE_DAILY_RECURRING,
 		SessionId      : "826cf6e3-d09a-46f1-9e7c-9d7b3ef3e459",
 		GuardianId     : "dfd5910e-942e-491a-a119-3a9ad60d3422",
-		// UserId         : []string{"02d0f543-b44a-4b88-b8f2-83c1ff5a51ac", "02d0f543-b44a-4b88-b8f2-83c1ff5a51ac", "02d0f543-b44a-4b88-b8f2-83c1ff5a51ac" },
-		UserId         : []string{"02d0f543-b44a-4b88-b8f2-83c1ff5a51ac"},
+		UserId         : []string{"02d0f543-b44a-4b88-b8f2-83c1ff5a51ac", "ac884ab5-96ca-482a-9160-56029cfb879f", "884d041c-372d-4ed0-8aeb-f8af49daabfc" },
 	}
 
 	sessionreq := &pb.CommitRequest{
