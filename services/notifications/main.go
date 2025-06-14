@@ -45,7 +45,8 @@ func BeginClient(port string) {
 	}
 
 	// Call GetStatus method
-	response, err := client.CreateSession(ctx, sessionreq)
+	// response, err := client.CreateSession(ctx, sessionreq)
+	response, err := client.BeginSession(ctx, sessionreq)
 	if err != nil {
 		log.Printf("Failed to get lock status: %v", err)
 	} else {
