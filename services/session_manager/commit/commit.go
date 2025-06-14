@@ -84,43 +84,47 @@ func buildBeginSessionQuery( req *pb.CommitRequest) string {
 }
 
 func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.CommitRequest) (*pb.CommitResponse, error) {
-	// SQL Query built to hand off to database driver.
 
-	fmt.Println(buildBeginSessionQuery(req));
-	// res, _ := db.Conn.Query(context.Background(), buildBeginSessionQuery(req)) ; 
+	// SQL Query built to hand off to database driver.
 	res := db.Conn.QueryRow(context.Background(), buildBeginSessionQuery(req)) ; 
 
-	// res.Next();
-	// fmt.Println(res.Values());
+	// Create session object & populate it using database response.  
+	x := &pb.Session{} ; 
 
-	// defer res.Close()
-	// Check if result is empty. 
-	
+	// Handle error if it occured. (Have to add a better default value for enums mane)
+	err := sessionFromRow(&res, x) ;
+	if err != nil {
+		return &pb.CommitResponse{
+			CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
+			CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
+		}, err 
+	}
+
+	// Create log within kafka topic ( for LockManager & Notifications microservices ) 
 
 
-	readSessionEntry(&res) ;
+	// Save session to redis db
+
 	return &pb.CommitResponse{
 		CommitStatus:  pb.CommitResponse_S_OK ,
-		CommitMessage: "Session successfully began",
+		CommitMessage: "Session successfully begun",
 	}, nil 
+
 }
 
 
 
-func readSessionEntry( row *pgx.Row ) (*pb.Session, error) {
+func sessionFromRow( row *pgx.Row, buffer *pb.Session ) (error) {
 
 	var session pb.Session ; 
 
 	var session_status string ; 
 	var session_type   string  ; 
 
-	// err := (*row).Scan(&session.SessionId , &session.GuardianId, &session.UserId, &session.SessionStatus, &session.SessionType) ;
-	
 	err := (*row).Scan(&session.SessionId , &session.GuardianId , &session.UserId , &session_status , &session_type) ;
 	if err != nil {
-		log.Fatalf("Error occured while attempting to deserialize session from db: %v", err) ; 
+		return fmt.Errorf("Error occured while de-serializing from db: %v", err) ; 
 	}
-
 
 	session.SessionStatus = pb.Session_SessionStatus(pb.Session_SessionStatus_value[session_status]) ; 
 	session.SessionType   = pb.Session_SessionType(pb.Session_SessionType_value[session_type]) ; 
@@ -131,7 +135,7 @@ func readSessionEntry( row *pgx.Row ) (*pb.Session, error) {
 	fmt.Println(session.SessionType) ; 
 	fmt.Println(session.SessionStatus) ; 
 
-	return &pb.Session{}, nil ; 
+	return nil ; 
 }
 
 
