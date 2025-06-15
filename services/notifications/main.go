@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	pb "github.com/keeper/services/notifications/gen/sessionpb" // Fix this 
+	pb "github.com/keeper/services/notifications/gen/sessionpb" 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

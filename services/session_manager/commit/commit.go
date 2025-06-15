@@ -7,7 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	pb "github.com/keeper/services/session_manager/gen/sessionpb"
-	db "github.com/keeper/services/session_manager/internal"
+	storage "github.com/keeper/services/session_manager/internal"
 )
 
 
@@ -63,7 +63,7 @@ func handleCreateSessionError(req *pb.CommitRequest, e error ) ( *pb.CommitRespo
 func (s *SessionManagerServerImpl) CreateSession(ctx context.Context, req *pb.CommitRequest) (*pb.CommitResponse, error) {
 
 	// SQL Query built to hand off to database driver.
-	_, err := db.Conn.Exec(context.Background() , buildCreateSessionQuery(req)) ;
+	_, err := storage.PSQL_Conn.Exec(context.Background() , buildCreateSessionQuery(req)) ;
 
 	// Call to Error handler function. 
 	if err != nil {
@@ -157,7 +157,7 @@ func reportSession(session *pb.Session , action Action ) error {
 func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.CommitRequest) (*pb.CommitResponse, error) {
 
 	// SQL Query built to hand off to database driver.
-	res := db.Conn.QueryRow(context.Background(), buildBeginSessionQuery(req)) ; 
+	res := storage.PSQL_Conn.QueryRow(context.Background(), buildBeginSessionQuery(req)) ; 
 
 
 	// Create session object & populate it using database response.  
@@ -196,6 +196,8 @@ func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.C
 
 	// Save session to redis db
 	
+
+
 
 	// Create log within kafka topic ( for LockManager & Notifications microservices ) 
 
