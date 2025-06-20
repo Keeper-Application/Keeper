@@ -2,12 +2,14 @@ package commit
 
 import (
 	"context"
+	"encoding/gob"
 	"fmt"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
 	pb "github.com/keeper/services/session_manager/gen/sessionpb"
 	storage "github.com/keeper/services/session_manager/internal"
+	"google.golang.org/protobuf/proto"
 )
 
 
@@ -156,6 +158,7 @@ func reportSession(session *pb.Session , action Action ) error {
 
 func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.CommitRequest) (*pb.CommitResponse, error) {
 
+	gob.Register( &pb.Session{} ) ; 
 	// SQL Query built to hand off to database driver.
 	res := storage.PSQL_Conn.QueryRow(context.Background(), buildBeginSessionQuery(req)) ; 
 
@@ -186,19 +189,22 @@ func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.C
 
 	// Check if Session is in valid state 
 
+	// TODO: Work on this error Handling 
+	
 	err = reportSession( x , ACTION_BEGIN ) ; 
 	if err != nil {
-		return &pb.CommitResponse{
-			CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
-			CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
-		}, err 
+		// return &pb.CommitResponse{
+		// 	CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
+		// 	CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
+		// }, err 
 	}
 
 	// Save session to redis db
-	
 
+	sessionToRedis( x ) ;
+	retreived, _ := sessionFromRedis(x.SessionId) ; 
 
-
+	fmt.Printf("Retrieved: %v\n", retreived) ; 
 	// Create log within kafka topic ( for LockManager & Notifications microservices ) 
 
 
@@ -211,10 +217,36 @@ func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.C
 
 }
 
+func sessionToRedis( s *pb.Session ) error {
+	serialized, err := proto.Marshal( s ) ; 
 
-func sessionFromRow( row *pgx.Row, buffer *pb.Session ) (error) {
+	if err != nil {
+		return fmt.Errorf("Failed to serialize session data: %v", err); 
+	}
+	storage.REDIS_Conn.Set( context.Background(), s.SessionId , serialized, 0) ; 
+	return nil  ; 
+}
+
+func sessionFromRedis(  uuid string ) ( *pb.Session, error ){
 
 	var session pb.Session ; 
+	bin, err := storage.REDIS_Conn.Get(context.Background(), uuid).Result() ; 
+	if err != nil {
+		return nil, fmt.Errorf("Failed to retrieve session from RedisDB: %v", err) ; 
+	}
+
+	err = proto.Unmarshal([]byte(bin), &session) ; 
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to deserialize session: %v", err) ; 
+	}
+
+	return &session, nil ; 
+}
+
+
+func sessionFromRow( row *pgx.Row, session *pb.Session ) (error) {
+
 
 	var session_status string ; 
 	var session_type   string  ; 
@@ -226,14 +258,7 @@ func sessionFromRow( row *pgx.Row, buffer *pb.Session ) (error) {
 
 	session.SessionStatus = pb.Session_SessionStatus(pb.Session_SessionStatus_value[session_status]) ; 
 	session.SessionType   = pb.Session_SessionType(pb.Session_SessionType_value[session_type]) ; 
-
-	fmt.Println(session.SessionId) ; 
-	fmt.Println(session.UserId) ; 
-	fmt.Println(session.GuardianId) ; 
-	fmt.Println(session.SessionType) ; 
-	fmt.Println(session.SessionStatus) ; 
-
-	return nil ; 
+	return nil  ; 
 }
 
 
