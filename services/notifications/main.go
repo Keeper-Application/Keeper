@@ -6,9 +6,11 @@ import (
 	"log"
 	"time"
 
-	pb "github.com/keeper/services/notifications/gen/sessionpb" 
+	pb "github.com/keeper/services/notifications/gen/sessionpb"
+	storage "github.com/keeper/services/notifications/internal"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/proto"
 )
 
 
@@ -55,6 +57,33 @@ func BeginClient(port string) {
 }
 
 func main() {
-  fmt.Println("Hello from notifications") ; 
+
+	go func() {
+		w := storage.KAFKA_Reader ; 
+		for {
+			m, err := w.ReadMessage(context.Background()); 
+			if err != nil {
+				/* Write to shared msv buffer */ 
+			}
+			x := &pb.Session{} ; 
+			proto.Unmarshal(m.Value, x) ;
+			fmt.Printf("%+v\n\n", x) ;
+		}
+	}()
+	fmt.Println("----------------------------------SPLIT--------------------------------------")
+	fmt.Println("----------------------------------SPLIT--------------------------------------")
+	fmt.Println("----------------------------------SPLIT--------------------------------------")
+	fmt.Println("----------------------------------SPLIT--------------------------------------")
+	fmt.Println("----------------------------------SPLIT--------------------------------------")
+	fmt.Println("----------------------------------SPLIT--------------------------------------")
+	fmt.Println("----------------------------------SPLIT--------------------------------------")
+	fmt.Println("----------------------------------SPLIT--------------------------------------")
+	fmt.Println("----------------------------------SPLIT--------------------------------------")
+	fmt.Println("----------------------------------SPLIT--------------------------------------")
+	fmt.Println("----------------------------------SPLIT--------------------------------------")
   BeginClient("50051") ; 
+	for {
+		;;
+	}
+
 }

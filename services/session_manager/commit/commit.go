@@ -209,13 +209,13 @@ func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.C
 
 	// TODO: Work on this error Handling 
 	
-	err = reportSession( x , ACTION_BEGIN ) ; 
-	if err != nil {
-		return &pb.CommitResponse{
-			CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
-			CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
-		}, err 
-	}
+	// err = reportSession( x , ACTION_BEGIN ) ; 
+	// if err != nil {
+	// 	return &pb.CommitResponse{
+	// 		CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
+	// 		CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
+	// 	}, err 
+	// }
 
 	// Save session to redis db
 
