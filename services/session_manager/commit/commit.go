@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	pb "github.com/keeper/services/session_manager/gen/sessionpb"
 	storage "github.com/keeper/services/session_manager/internal"
+	"github.com/segmentio/kafka-go"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -205,11 +206,17 @@ func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.C
 	retreived, _ := sessionFromRedis(x.SessionId) ; 
 
 	fmt.Printf("Retrieved: %v\n", retreived) ; 
-	// Create log within kafka topic ( for LockManager & Notifications microservices ) 
 
+	// Create log within kafka topic ( for LockManager & Notifications microservices ) 
 
 	// Update state within db. 
 	
+	err = sessionToKakfa( "my-topic", x ) ;  
+
+	if err != nil {
+		return &pb.CommitResponse{} ,fmt.Errorf("Error occured while serializing: %v", err); 
+	} 
+
 	return &pb.CommitResponse{
 		CommitStatus:  pb.CommitResponse_S_OK ,
 		CommitMessage: "Session successfully begun",
@@ -217,8 +224,39 @@ func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.C
 
 }
 
+func sessionToKakfa( topic string, s *pb.Session) error { 
+
+	// Move writer outisde, it should be configured outside of this function. 
+
+	c := kafka.WriterConfig{
+			Brokers: []string{"localhost:9092"},
+			Topic: topic,
+	}
+
+	w := kafka.NewWriter(c); 
+
+	serialized, err := proto.Marshal(s) ; 
+	if err != nil {
+		return fmt.Errorf("Error occured while serializing: %v", err); 
+	}
+
+	m := kafka.Message{
+		Key: []byte(s.SessionId),
+		Value: serialized,
+	}
+
+	fmt.Printf("%#v", m) ; 
+	if err := w.WriteMessages(context.Background(), m); err != nil {
+		return fmt.Errorf("Error occured while saving to partition: %v", err); 
+	}
+
+	return nil 
+}
+
 func sessionToRedis( s *pb.Session ) error {
-	serialized, err := proto.Marshal( s ) ; 
+	// TODO: Marshall this struct once.  && Share between redis & kafka.
+	
+	serialized, err := proto.Marshal( s ) ;  
 
 	if err != nil {
 		return fmt.Errorf("Failed to serialize session data: %v", err); 

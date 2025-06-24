@@ -1,0 +1,4 @@
+#!/usr/sbin/bash
+
+export DB_URL='postgres://admin:sessionsdb365!@localhost:5432/sessionsdb'
+export REDIS_URL='redis://:@localhost:6379/0'
