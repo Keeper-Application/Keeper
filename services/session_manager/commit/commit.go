@@ -2,7 +2,6 @@ package commit
 
 import (
 	"context"
-	"encoding/gob"
 	"fmt"
 	"strings"
 
@@ -157,35 +156,53 @@ func reportSession(session *pb.Session , action Action ) error {
 	}
 }
 
+/*
+   @purpose:      Protobuf Routine which begins a Session with the SessionID Specified by the
+									Protobuf Message. 
+
+
+   @param:        [in]                       *pb.Session   session
+                                             Pointer to the session object whose status
+                                             is to be validated against the requested action.
+
+   @param:        [in]                       Action        action
+                                             The requested operation to apply to the session.
+
+   @param:        [in]                       Action        action
+                                             The requested operation to apply to the session.
+
+                                       return
+
+   @return:       nil                      The action is allowed for the session's current state.
+
+   @return:       fmt.Errorf               Descripting string error returned only when the requested 
+	                                         action is invalid or inconsistent with the session’s current
+																					 status. (e.g., attempting to begin an already active session)
+
+	@notes:         This routine currently performs the following in sequence: Builds
+									a database query using the sessionID, Queries the PostgresDB retreiving
+									the entry associated with the session. Uses the database entry to construct
+									a pb.Session instance, Writes the Contents of the Session into a redis db &
+									kafka topic associated with Sessions, and finally returns a CommitResponse
+									to the client. TODO: This function should be split up into different parts 
+									and be made to run asynchronously. 
+*/
 func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.CommitRequest) (*pb.CommitResponse, error) {
 
-	gob.Register( &pb.Session{} ) ; 
 	// SQL Query built to hand off to database driver.
 	res := storage.PSQL_Conn.QueryRow(context.Background(), buildBeginSessionQuery(req)) ; 
-
 
 	// Create session object & populate it using database response.  
 	x := &pb.Session{} ; 
 
-
-
-	// Handle error if it occured. (Have to add a better default value for enums mane)
 	// TODO: Add error handler function here to remove verbosity. Two cases for now.
-	
 	err := sessionFromRow(&res, x) ;
+
 	if err != nil {
-		switch err {
-		case pgx.ErrNoRows:
 		return &pb.CommitResponse{
 			CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
 			CommitMessage: fmt.Sprintf("Session with ID '%v' does not exist:  %v", req.SessionInfo.SessionId, err) ,
 		}, err 
-		default:
-		return &pb.CommitResponse{
-			CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
-			CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
-		}, err 
-		}
 	}
 
 	// Check if Session is in valid state 
@@ -194,27 +211,29 @@ func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.C
 	
 	err = reportSession( x , ACTION_BEGIN ) ; 
 	if err != nil {
-		// return &pb.CommitResponse{
-		// 	CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
-		// 	CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
-		// }, err 
+		return &pb.CommitResponse{
+			CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
+			CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
+		}, err 
 	}
 
 	// Save session to redis db
 
-	sessionToRedis( x ) ;
-	retreived, _ := sessionFromRedis(x.SessionId) ; 
-
-	fmt.Printf("Retrieved: %v\n", retreived) ; 
-
-	// Create log within kafka topic ( for LockManager & Notifications microservices ) 
-
-	// Update state within db. 
-	
-	err = sessionToKakfa( "my-topic", x ) ;  
+	err = sessionToRedis( x ) ;
 
 	if err != nil {
-		return &pb.CommitResponse{} ,fmt.Errorf("Error occured while serializing: %v", err); 
+		return &pb.CommitResponse{
+			CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
+			CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
+		}, fmt.Errorf("Error occured while serializing: %v", err); 
+	} 
+
+	err = sessionToKakfa( "my-topic", x ) ;  
+	if err != nil {
+		return &pb.CommitResponse{
+			CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
+			CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
+		} ,fmt.Errorf("Error occured while serializing: %v", err); 
 	} 
 
 	return &pb.CommitResponse{
