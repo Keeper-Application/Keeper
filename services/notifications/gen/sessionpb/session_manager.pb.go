@@ -82,7 +82,7 @@ func (x Session_SessionType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Session_SessionType.Descriptor instead.
 func (Session_SessionType) EnumDescriptor() ([]byte, []int) {
-	return file_session_manager_proto_rawDescGZIP(), []int{0, 0}
+	return file_session_manager_proto_rawDescGZIP(), []int{1, 0}
 }
 
 type Session_SessionStatus int32
@@ -137,7 +137,7 @@ func (x Session_SessionStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Session_SessionStatus.Descriptor instead.
 func (Session_SessionStatus) EnumDescriptor() ([]byte, []int) {
-	return file_session_manager_proto_rawDescGZIP(), []int{0, 1}
+	return file_session_manager_proto_rawDescGZIP(), []int{1, 1}
 }
 
 type CommitRequest_UserType int32
@@ -183,7 +183,7 @@ func (x CommitRequest_UserType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use CommitRequest_UserType.Descriptor instead.
 func (CommitRequest_UserType) EnumDescriptor() ([]byte, []int) {
-	return file_session_manager_proto_rawDescGZIP(), []int{1, 0}
+	return file_session_manager_proto_rawDescGZIP(), []int{2, 0}
 }
 
 type CommitResponse_CommitStatus int32
@@ -244,7 +244,59 @@ func (x CommitResponse_CommitStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use CommitResponse_CommitStatus.Descriptor instead.
 func (CommitResponse_CommitStatus) EnumDescriptor() ([]byte, []int) {
-	return file_session_manager_proto_rawDescGZIP(), []int{2, 0}
+	return file_session_manager_proto_rawDescGZIP(), []int{3, 0}
+}
+
+type Interval struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	StartTime     float64                `protobuf:"fixed64,1,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	EndTime       float64                `protobuf:"fixed64,2,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Interval) Reset() {
+	*x = Interval{}
+	mi := &file_session_manager_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Interval) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Interval) ProtoMessage() {}
+
+func (x *Interval) ProtoReflect() protoreflect.Message {
+	mi := &file_session_manager_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Interval.ProtoReflect.Descriptor instead.
+func (*Interval) Descriptor() ([]byte, []int) {
+	return file_session_manager_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Interval) GetStartTime() float64 {
+	if x != nil {
+		return x.StartTime
+	}
+	return 0
+}
+
+func (x *Interval) GetEndTime() float64 {
+	if x != nil {
+		return x.EndTime
+	}
+	return 0
 }
 
 type Session struct {
@@ -254,13 +306,14 @@ type Session struct {
 	SessionId     string                 `protobuf:"bytes,3,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	GuardianId    string                 `protobuf:"bytes,4,opt,name=guardian_id,json=guardianId,proto3" json:"guardian_id,omitempty"`
 	UserId        []string               `protobuf:"bytes,5,rep,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Duration      *Interval              `protobuf:"bytes,6,opt,name=duration,proto3" json:"duration,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Session) Reset() {
 	*x = Session{}
-	mi := &file_session_manager_proto_msgTypes[0]
+	mi := &file_session_manager_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -272,7 +325,7 @@ func (x *Session) String() string {
 func (*Session) ProtoMessage() {}
 
 func (x *Session) ProtoReflect() protoreflect.Message {
-	mi := &file_session_manager_proto_msgTypes[0]
+	mi := &file_session_manager_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -285,7 +338,7 @@ func (x *Session) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Session.ProtoReflect.Descriptor instead.
 func (*Session) Descriptor() ([]byte, []int) {
-	return file_session_manager_proto_rawDescGZIP(), []int{0}
+	return file_session_manager_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Session) GetSessionStatus() Session_SessionStatus {
@@ -323,6 +376,13 @@ func (x *Session) GetUserId() []string {
 	return nil
 }
 
+func (x *Session) GetDuration() *Interval {
+	if x != nil {
+		return x.Duration
+	}
+	return nil
+}
+
 type CommitRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserType      CommitRequest_UserType `protobuf:"varint,1,opt,name=user_type,json=userType,proto3,enum=CommitRequest_UserType" json:"user_type,omitempty"`
@@ -335,7 +395,7 @@ type CommitRequest struct {
 
 func (x *CommitRequest) Reset() {
 	*x = CommitRequest{}
-	mi := &file_session_manager_proto_msgTypes[1]
+	mi := &file_session_manager_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -347,7 +407,7 @@ func (x *CommitRequest) String() string {
 func (*CommitRequest) ProtoMessage() {}
 
 func (x *CommitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_session_manager_proto_msgTypes[1]
+	mi := &file_session_manager_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -360,7 +420,7 @@ func (x *CommitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommitRequest.ProtoReflect.Descriptor instead.
 func (*CommitRequest) Descriptor() ([]byte, []int) {
-	return file_session_manager_proto_rawDescGZIP(), []int{1}
+	return file_session_manager_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CommitRequest) GetUserType() CommitRequest_UserType {
@@ -401,7 +461,7 @@ type CommitResponse struct {
 
 func (x *CommitResponse) Reset() {
 	*x = CommitResponse{}
-	mi := &file_session_manager_proto_msgTypes[2]
+	mi := &file_session_manager_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -413,7 +473,7 @@ func (x *CommitResponse) String() string {
 func (*CommitResponse) ProtoMessage() {}
 
 func (x *CommitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_session_manager_proto_msgTypes[2]
+	mi := &file_session_manager_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -426,7 +486,7 @@ func (x *CommitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommitResponse.ProtoReflect.Descriptor instead.
 func (*CommitResponse) Descriptor() ([]byte, []int) {
-	return file_session_manager_proto_rawDescGZIP(), []int{2}
+	return file_session_manager_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CommitResponse) GetCommitStatus() CommitResponse_CommitStatus {
@@ -443,11 +503,111 @@ func (x *CommitResponse) GetCommitMessage() string {
 	return ""
 }
 
+type FetchRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Uuid          string                 `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FetchRequest) Reset() {
+	*x = FetchRequest{}
+	mi := &file_session_manager_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FetchRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FetchRequest) ProtoMessage() {}
+
+func (x *FetchRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_session_manager_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FetchRequest.ProtoReflect.Descriptor instead.
+func (*FetchRequest) Descriptor() ([]byte, []int) {
+	return file_session_manager_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *FetchRequest) GetUuid() string {
+	if x != nil {
+		return x.Uuid
+	}
+	return ""
+}
+
+type FetchResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FetchResponse string                 `protobuf:"bytes,1,opt,name=fetch_response,json=fetchResponse,proto3" json:"fetch_response,omitempty"`
+	Sessions      []*Session             `protobuf:"bytes,2,rep,name=sessions,proto3" json:"sessions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FetchResponse) Reset() {
+	*x = FetchResponse{}
+	mi := &file_session_manager_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FetchResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FetchResponse) ProtoMessage() {}
+
+func (x *FetchResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_session_manager_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FetchResponse.ProtoReflect.Descriptor instead.
+func (*FetchResponse) Descriptor() ([]byte, []int) {
+	return file_session_manager_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *FetchResponse) GetFetchResponse() string {
+	if x != nil {
+		return x.FetchResponse
+	}
+	return ""
+}
+
+func (x *FetchResponse) GetSessions() []*Session {
+	if x != nil {
+		return x.Sessions
+	}
+	return nil
+}
+
 var File_session_manager_proto protoreflect.FileDescriptor
 
 const file_session_manager_proto_rawDesc = "" +
 	"\n" +
-	"\x15session_manager.proto\"\xf7\x04\n" +
+	"\x15session_manager.proto\"D\n" +
+	"\bInterval\x12\x1d\n" +
+	"\n" +
+	"start_time\x18\x01 \x01(\x01R\tstartTime\x12\x19\n" +
+	"\bend_time\x18\x02 \x01(\x01R\aendTime\"\x9e\x05\n" +
 	"\aSession\x12=\n" +
 	"\x0esession_status\x18\x01 \x01(\x0e2\x16.Session.SessionStatusR\rsessionStatus\x127\n" +
 	"\fsession_type\x18\x02 \x01(\x0e2\x14.Session.SessionTypeR\vsessionType\x12\x1d\n" +
@@ -455,7 +615,8 @@ const file_session_manager_proto_rawDesc = "" +
 	"session_id\x18\x03 \x01(\tR\tsessionId\x12\x1f\n" +
 	"\vguardian_id\x18\x04 \x01(\tR\n" +
 	"guardianId\x12\x17\n" +
-	"\auser_id\x18\x05 \x03(\tR\x06userId\"\x8f\x02\n" +
+	"\auser_id\x18\x05 \x03(\tR\x06userId\x12%\n" +
+	"\bduration\x18\x06 \x01(\v2\t.IntervalR\bduration\"\x8f\x02\n" +
 	"\vSessionType\x12\x1a\n" +
 	"\x16SESSION_TYPE_UNDEFINED\x10\x00\x12\x1b\n" +
 	"\x17SESSION_TYPE_TIME_BOUND\x10\x01\x12\x1b\n" +
@@ -490,7 +651,12 @@ const file_session_manager_proto_rawDesc = "" +
 	"\fE_PERMISSION\x10\x04\x12\n" +
 	"\n" +
 	"\x06E_BUSY\x10\x05\x12\b\n" +
-	"\x04S_OK\x10\x062\xb9\x02\n" +
+	"\x04S_OK\x10\x06\"\"\n" +
+	"\fFetchRequest\x12\x12\n" +
+	"\x04uuid\x18\x01 \x01(\tR\x04uuid\"\\\n" +
+	"\rFetchResponse\x12%\n" +
+	"\x0efetch_response\x18\x01 \x01(\tR\rfetchResponse\x12$\n" +
+	"\bsessions\x18\x02 \x03(\v2\b.SessionR\bsessions2\xe9\x02\n" +
 	"\x0eSessionManager\x120\n" +
 	"\rCreateSession\x12\x0e.CommitRequest\x1a\x0f.CommitResponse\x120\n" +
 	"\rUpdateSession\x12\x0e.CommitRequest\x1a\x0f.CommitResponse\x12/\n" +
@@ -498,7 +664,8 @@ const file_session_manager_proto_rawDesc = "" +
 	"\n" +
 	"EndSession\x12\x0e.CommitRequest\x1a\x0f.CommitResponse\x120\n" +
 	"\rDeleteSession\x12\x0e.CommitRequest\x1a\x0f.CommitResponse\x121\n" +
-	"\x0eSuspendSession\x12\x0e.CommitRequest\x1a\x0f.CommitResponseB/Z-services/session_manager/gen/sessionpb;commitb\x06proto3"
+	"\x0eSuspendSession\x12\x0e.CommitRequest\x1a\x0f.CommitResponse\x12.\n" +
+	"\rFetchSessions\x12\r.FetchRequest\x1a\x0e.FetchResponseB/Z-services/session_manager/gen/sessionpb;commitb\x06proto3"
 
 var (
 	file_session_manager_proto_rawDescOnce sync.Once
@@ -513,39 +680,46 @@ func file_session_manager_proto_rawDescGZIP() []byte {
 }
 
 var file_session_manager_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_session_manager_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_session_manager_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_session_manager_proto_goTypes = []any{
 	(Session_SessionType)(0),         // 0: Session.SessionType
 	(Session_SessionStatus)(0),       // 1: Session.SessionStatus
 	(CommitRequest_UserType)(0),      // 2: CommitRequest.UserType
 	(CommitResponse_CommitStatus)(0), // 3: CommitResponse.CommitStatus
-	(*Session)(nil),                  // 4: Session
-	(*CommitRequest)(nil),            // 5: CommitRequest
-	(*CommitResponse)(nil),           // 6: CommitResponse
+	(*Interval)(nil),                 // 4: Interval
+	(*Session)(nil),                  // 5: Session
+	(*CommitRequest)(nil),            // 6: CommitRequest
+	(*CommitResponse)(nil),           // 7: CommitResponse
+	(*FetchRequest)(nil),             // 8: FetchRequest
+	(*FetchResponse)(nil),            // 9: FetchResponse
 }
 var file_session_manager_proto_depIdxs = []int32{
 	1,  // 0: Session.session_status:type_name -> Session.SessionStatus
 	0,  // 1: Session.session_type:type_name -> Session.SessionType
-	2,  // 2: CommitRequest.user_type:type_name -> CommitRequest.UserType
-	4,  // 3: CommitRequest.session_info:type_name -> Session
-	3,  // 4: CommitResponse.commit_status:type_name -> CommitResponse.CommitStatus
-	5,  // 5: SessionManager.CreateSession:input_type -> CommitRequest
-	5,  // 6: SessionManager.UpdateSession:input_type -> CommitRequest
-	5,  // 7: SessionManager.BeginSession:input_type -> CommitRequest
-	5,  // 8: SessionManager.EndSession:input_type -> CommitRequest
-	5,  // 9: SessionManager.DeleteSession:input_type -> CommitRequest
-	5,  // 10: SessionManager.SuspendSession:input_type -> CommitRequest
-	6,  // 11: SessionManager.CreateSession:output_type -> CommitResponse
-	6,  // 12: SessionManager.UpdateSession:output_type -> CommitResponse
-	6,  // 13: SessionManager.BeginSession:output_type -> CommitResponse
-	6,  // 14: SessionManager.EndSession:output_type -> CommitResponse
-	6,  // 15: SessionManager.DeleteSession:output_type -> CommitResponse
-	6,  // 16: SessionManager.SuspendSession:output_type -> CommitResponse
-	11, // [11:17] is the sub-list for method output_type
-	5,  // [5:11] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	4,  // 2: Session.duration:type_name -> Interval
+	2,  // 3: CommitRequest.user_type:type_name -> CommitRequest.UserType
+	5,  // 4: CommitRequest.session_info:type_name -> Session
+	3,  // 5: CommitResponse.commit_status:type_name -> CommitResponse.CommitStatus
+	5,  // 6: FetchResponse.sessions:type_name -> Session
+	6,  // 7: SessionManager.CreateSession:input_type -> CommitRequest
+	6,  // 8: SessionManager.UpdateSession:input_type -> CommitRequest
+	6,  // 9: SessionManager.BeginSession:input_type -> CommitRequest
+	6,  // 10: SessionManager.EndSession:input_type -> CommitRequest
+	6,  // 11: SessionManager.DeleteSession:input_type -> CommitRequest
+	6,  // 12: SessionManager.SuspendSession:input_type -> CommitRequest
+	8,  // 13: SessionManager.FetchSessions:input_type -> FetchRequest
+	7,  // 14: SessionManager.CreateSession:output_type -> CommitResponse
+	7,  // 15: SessionManager.UpdateSession:output_type -> CommitResponse
+	7,  // 16: SessionManager.BeginSession:output_type -> CommitResponse
+	7,  // 17: SessionManager.EndSession:output_type -> CommitResponse
+	7,  // 18: SessionManager.DeleteSession:output_type -> CommitResponse
+	7,  // 19: SessionManager.SuspendSession:output_type -> CommitResponse
+	9,  // 20: SessionManager.FetchSessions:output_type -> FetchResponse
+	14, // [14:21] is the sub-list for method output_type
+	7,  // [7:14] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_session_manager_proto_init() }
@@ -559,7 +733,7 @@ func file_session_manager_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_session_manager_proto_rawDesc), len(file_session_manager_proto_rawDesc)),
 			NumEnums:      4,
-			NumMessages:   3,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

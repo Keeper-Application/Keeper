@@ -19,8 +19,8 @@ service SessionManager {
 // Might change this to be google.proto.any to represent any interval. 
 
 message Interval {
-  double                      start_time        = 0 ;
-  double                      end_time          = 1 ;
+  double                      start_time        = 1 ;
+  double                      end_time          = 2 ;
 }
 
 message Session {
@@ -93,10 +93,10 @@ message CommitResponse{
 }
 
 message FetchRequest {
-  string                      uuid              = 0 ;
+  string                      uuid              = 1 ;
 }
 
 message FetchResponse {
-  string                      fetch_response    = 0 ;
-  repeated    Session         sessions          = 0 ; 
+  string                      fetch_response    = 1 ;
+  repeated    Session         sessions          = 2 ; 
 }

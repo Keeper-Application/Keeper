@@ -1,0 +1,23 @@
+#!/usr/sbin/bash
+
+set -e # Exit on any error
+
+PROTO_FILE="proto/session_manager.proto"
+PROTO_PATH="proto"
+OUT_DIRS=(
+  "services/session_manager/gen/sessionpb"
+  "services/notifications/gen/sessionpb"
+  "services/lock_manager/gen/sessionpb"
+)
+
+for DIR in "${OUT_DIRS[@]}"; do
+  echo "Generating Go code in: $DIR"
+
+  protoc \
+    --proto_path="$PROTO_PATH" \
+    --go_out=paths=source_relative:"$DIR" \
+    --go-grpc_out=paths=source_relative:"$DIR" \
+    "$PROTO_FILE"
+done
+
+echo "Generated protos successfully"

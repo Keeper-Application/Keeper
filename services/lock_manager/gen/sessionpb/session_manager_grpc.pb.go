@@ -25,6 +25,7 @@ const (
 	SessionManager_EndSession_FullMethodName     = "/SessionManager/EndSession"
 	SessionManager_DeleteSession_FullMethodName  = "/SessionManager/DeleteSession"
 	SessionManager_SuspendSession_FullMethodName = "/SessionManager/SuspendSession"
+	SessionManager_FetchSessions_FullMethodName  = "/SessionManager/FetchSessions"
 )
 
 // SessionManagerClient is the client API for SessionManager service.
@@ -37,6 +38,7 @@ type SessionManagerClient interface {
 	EndSession(ctx context.Context, in *CommitRequest, opts ...grpc.CallOption) (*CommitResponse, error)
 	DeleteSession(ctx context.Context, in *CommitRequest, opts ...grpc.CallOption) (*CommitResponse, error)
 	SuspendSession(ctx context.Context, in *CommitRequest, opts ...grpc.CallOption) (*CommitResponse, error)
+	FetchSessions(ctx context.Context, in *FetchRequest, opts ...grpc.CallOption) (*FetchResponse, error)
 }
 
 type sessionManagerClient struct {
@@ -107,6 +109,16 @@ func (c *sessionManagerClient) SuspendSession(ctx context.Context, in *CommitReq
 	return out, nil
 }
 
+func (c *sessionManagerClient) FetchSessions(ctx context.Context, in *FetchRequest, opts ...grpc.CallOption) (*FetchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FetchResponse)
+	err := c.cc.Invoke(ctx, SessionManager_FetchSessions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SessionManagerServer is the server API for SessionManager service.
 // All implementations must embed UnimplementedSessionManagerServer
 // for forward compatibility.
@@ -117,6 +129,7 @@ type SessionManagerServer interface {
 	EndSession(context.Context, *CommitRequest) (*CommitResponse, error)
 	DeleteSession(context.Context, *CommitRequest) (*CommitResponse, error)
 	SuspendSession(context.Context, *CommitRequest) (*CommitResponse, error)
+	FetchSessions(context.Context, *FetchRequest) (*FetchResponse, error)
 	mustEmbedUnimplementedSessionManagerServer()
 }
 
@@ -144,6 +157,9 @@ func (UnimplementedSessionManagerServer) DeleteSession(context.Context, *CommitR
 }
 func (UnimplementedSessionManagerServer) SuspendSession(context.Context, *CommitRequest) (*CommitResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SuspendSession not implemented")
+}
+func (UnimplementedSessionManagerServer) FetchSessions(context.Context, *FetchRequest) (*FetchResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FetchSessions not implemented")
 }
 func (UnimplementedSessionManagerServer) mustEmbedUnimplementedSessionManagerServer() {}
 func (UnimplementedSessionManagerServer) testEmbeddedByValue()                        {}
@@ -274,6 +290,24 @@ func _SessionManager_SuspendSession_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SessionManager_FetchSessions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FetchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SessionManagerServer).FetchSessions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SessionManager_FetchSessions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SessionManagerServer).FetchSessions(ctx, req.(*FetchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SessionManager_ServiceDesc is the grpc.ServiceDesc for SessionManager service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +338,10 @@ var SessionManager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SuspendSession",
 			Handler:    _SessionManager_SuspendSession_Handler,
+		},
+		{
+			MethodName: "FetchSessions",
+			Handler:    _SessionManager_FetchSessions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
