@@ -2,12 +2,25 @@ syntax = "proto3" ;
 option go_package = "services/session_manager/gen/sessionpb;commit"; 
 
 service SessionManager {
+
   rpc CreateSession(CommitRequest)  returns  (CommitResponse);
   rpc UpdateSession(CommitRequest)  returns  (CommitResponse);
   rpc BeginSession(CommitRequest)   returns  (CommitResponse);
   rpc EndSession(CommitRequest)     returns  (CommitResponse);
   rpc DeleteSession(CommitRequest)  returns  (CommitResponse);
   rpc SuspendSession(CommitRequest) returns  (CommitResponse);
+
+
+  rpc FetchSessions(FetchRequest)   returns  (FetchResponse);
+
+}
+
+
+// Might change this to be google.proto.any to represent any interval. 
+
+message Interval {
+  double                      start_time        = 0 ;
+  double                      end_time          = 1 ;
 }
 
 message Session {
@@ -40,6 +53,7 @@ message Session {
   string                      session_id        = 3 ; 
   string                      guardian_id       = 4 ; 
   repeated      string        user_id           = 5 ; 
+  Interval                    duration          = 6 ; 
 
 }
 
@@ -65,15 +79,24 @@ message CommitRequest {
 message CommitResponse{
 
   enum CommitStatus {
-    E_EXISTS                                       = 0 ;
-    E_ACCESS                                       = 1 ; 
-    E_LIMITREACHED                                 = 2 ; 
-    E_INEXISTENT                                   = 3 ; 
-    E_PERMISSION                                   = 4 ; 
-    E_BUSY                                         = 5 ; 
-    S_OK                                           = 6 ; 
+    E_EXISTS                                    = 0 ;
+    E_ACCESS                                    = 1 ; 
+    E_LIMITREACHED                              = 2 ; 
+    E_INEXISTENT                                = 3 ; 
+    E_PERMISSION                                = 4 ; 
+    E_BUSY                                      = 5 ; 
+    S_OK                                        = 6 ; 
   }
 
   CommitStatus commit_status  = 1 ; 
   string       commit_message = 2 ; 
+}
+
+message FetchRequest {
+  string                      uuid              = 0 ;
+}
+
+message FetchResponse {
+  string                      fetch_response    = 0 ;
+  repeated    Session         sessions          = 0 ; 
 }

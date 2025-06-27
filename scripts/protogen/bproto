@@ -1,0 +1,11 @@
+#!/usr/sbin/bash
+
+# Recursively Walk through all of the directories. Until gen folder is found || no more directories .
+
+WalkDir() {
+  mapfile -t files < <(ls)
+  array_length=${#files[@]}
+  echo "$array_length"
+}
+
+WalkDir
