@@ -303,8 +303,6 @@ func sessionFromRedis(  uuid string ) ( *pb.Session, error ){
 
 
 func sessionFromRow( row *pgx.Row, session *pb.Session ) (error) {
-
-
 	var session_status string ; 
 	var session_type   string  ; 
 
