@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"strings"
-
 	"github.com/jackc/pgx/v5"
 	pb "github.com/keeper/services/session_manager/gen/sessionpb"
-	storage "github.com/keeper/services/session_manager/internal"
+	storage "github.com/keeper/services/session_manager/internal/storage"
+	util "github.com/keeper/services/session_manager/internal/util"
 	"github.com/segmentio/kafka-go"
 	"google.golang.org/protobuf/proto"
 )
@@ -89,6 +89,7 @@ func handleBeginSessionError(req *pb.CommitRequest, e error ) (*pb.CommitRespons
 
 func buildBeginSessionQuery( req *pb.CommitRequest) string {
 	sql := fmt.Sprintf("SELECT * FROM sessions WHERE session_id = '%v'", req.SessionInfo.SessionId ) ; 
+	fmt.Print(req.SessionInfo.SessionId) ;
 	return sql ;
 }
 
@@ -209,13 +210,13 @@ func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.C
 
 	// TODO: Work on this error Handling 
 	
-	// err = reportSession( x , ACTION_BEGIN ) ; 
-	// if err != nil {
-	// 	return &pb.CommitResponse{
-	// 		CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
-	// 		CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
-	// 	}, err 
-	// }
+	err = reportSession( x , ACTION_BEGIN ) ; 
+	if err != nil {
+		return &pb.CommitResponse{
+			CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
+			CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
+		}, err 
+	}
 
 	// Save session to redis db
 
@@ -301,21 +302,44 @@ func sessionFromRedis(  uuid string ) ( *pb.Session, error ){
 	return &session, nil ; 
 }
 
+/*
+
+-[ RECORD 1 ]+----------------------------------------------------------------------------
+session_id   | dfd5910e-942e-491a-a119-3a9ad60d3422
+guardian_id  | 826cf6e3-d09a-46f1-9e7c-9d7b3ef3e459
+user_ids     | {02d0f543-b44a-4b88-b8f2-83c1ff5a51ac,02d0f543-b44a-4b88-b8f2-83c1ff5a51ac}
+status       | SESSION_STATUS_INACTIVE
+session_type | SESSION_TYPE_UNDEFINED
+time_start   |
+time_end     |
+
+*/
+
+// Might have to pass in any{} and then typecast if its not null byte value type ig. 
 
 func sessionFromRow( row *pgx.Row, session *pb.Session ) (error) {
-	var session_status string ; 
-	var session_type   string  ; 
 
-	err := (*row).Scan(&session.SessionId , &session.GuardianId , &session.UserId , &session_status , &session_type) ;
+	var session_status string  ; 
+	var session_type   string  ; 
+	var start_time     interface{}; 
+	var end_time       interface{}; 
+
+	err := (*row).Scan( &session.SessionId, &session.GuardianId, &session.UserId, &session_status, &session_type, &start_time , &end_time ) ;
+
+
 	if err != nil {
 		return fmt.Errorf("Error occured while de-serializing from db: %v", err) ; 
+	}
+
+	session.Duration = &pb.Interval{
+		StartTime : util.NMutCast[float64]( start_time )  ,
+		EndTime   : util.NMutCast[float64]( end_time   )  ,
 	}
 
 	session.SessionStatus = pb.Session_SessionStatus(pb.Session_SessionStatus_value[session_status]) ; 
 	session.SessionType   = pb.Session_SessionType(pb.Session_SessionType_value[session_type]) ; 
 	return nil  ; 
 }
-
 
 // func UpdateSession(req_buffer *CommitRequest , resp_buffer *CommitResponse) CommitStatus {
 //   fmt.Println( " Hello from commit " ); 

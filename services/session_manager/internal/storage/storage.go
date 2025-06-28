@@ -32,6 +32,7 @@ var       KAFKA_Reader    *kafka.Reader  = initializeKafkaReader() ;
 */
 
 func initializeDB() *pgx.Conn {
+
 	if len(os.Getenv("DB_URL")) == 0 {
 		log.Fatal("Malformed environment variable: $DB_URL is not defined.") ; 
 	}
@@ -41,6 +42,7 @@ func initializeDB() *pgx.Conn {
 	}
 
 	return conn ; 
+
 }
 
 

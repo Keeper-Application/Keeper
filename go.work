@@ -1,6 +1,7 @@
-go 1.23.6
+go 1.24.4
 
 use (
+	./services/auth
 	./services/lock_manager
 	./services/notifications
 	./services/session_manager
