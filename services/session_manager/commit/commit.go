@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+
 	"github.com/jackc/pgx/v5"
 	pb "github.com/keeper/services/session_manager/gen/sessionpb"
 	storage "github.com/keeper/services/session_manager/internal/storage"
@@ -210,32 +211,32 @@ func ( s *SessionManagerServerImpl) BeginSession( ctx context.Context, req *pb.C
 
 	// TODO: Work on this error Handling 
 	
-	err = reportSession( x , ACTION_BEGIN ) ; 
-	if err != nil {
-		return &pb.CommitResponse{
-			CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
-			CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
-		}, err 
-	}
-
-	// Save session to redis db
-
-	err = sessionToRedis( x ) ;
-
-	if err != nil {
-		return &pb.CommitResponse{
-			CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
-			CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
-		}, fmt.Errorf("Error occured while serializing: %v", err); 
-	} 
-
-	err = sessionToKakfa( "my-topic", x ) ;  
-	if err != nil {
-		return &pb.CommitResponse{
-			CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
-			CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
-		} ,fmt.Errorf("Error occured while serializing: %v", err); 
-	} 
+	// err = reportSession( x , ACTION_BEGIN ) ; 
+	// if err != nil {
+	// 	return &pb.CommitResponse{
+	// 		CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
+	// 		CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
+	// 	}, err 
+	// }
+	//
+	// // Save session to redis db
+	//
+	// err = sessionToRedis( x ) ;
+	//
+	// if err != nil {
+	// 	return &pb.CommitResponse{
+	// 		CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
+	// 		CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
+	// 	}, fmt.Errorf("Error occured while serializing: %v", err); 
+	// } 
+	//
+	// err = sessionToKakfa( "my-topic", x ) ;  
+	// if err != nil {
+	// 	return &pb.CommitResponse{
+	// 		CommitStatus:  pb.CommitResponse_E_INEXISTENT ,
+	// 		CommitMessage: fmt.Sprintf("Error occured while beginning session: %v", err) ,
+	// 	} ,fmt.Errorf("Error occured while serializing: %v", err); 
+	// } 
 
 	return &pb.CommitResponse{
 		CommitStatus:  pb.CommitResponse_S_OK ,
@@ -321,8 +322,8 @@ func sessionFromRow( row *pgx.Row, session *pb.Session ) (error) {
 
 	var session_status string  ; 
 	var session_type   string  ; 
-	var start_time     interface{}; 
-	var end_time       interface{}; 
+	var start_time     *string ; 
+	var end_time       *string ; 
 
 	err := (*row).Scan( &session.SessionId, &session.GuardianId, &session.UserId, &session_status, &session_type, &start_time , &end_time ) ;
 
@@ -332,13 +333,68 @@ func sessionFromRow( row *pgx.Row, session *pb.Session ) (error) {
 	}
 
 	session.Duration = &pb.Interval{
-		StartTime : util.NMutCast[float64]( start_time )  ,
-		EndTime   : util.NMutCast[float64]( end_time   )  ,
+		StartTime : util.NMutCast[string]( start_time )  ,
+		EndTime   : util.NMutCast[string]( end_time   )  ,
 	}
 
 	session.SessionStatus = pb.Session_SessionStatus(pb.Session_SessionStatus_value[session_status]) ; 
 	session.SessionType   = pb.Session_SessionType(pb.Session_SessionType_value[session_type]) ; 
 	return nil  ; 
+}
+
+
+
+func (s *SessionManagerServerImpl) FetchSessions( ctx context.Context, req *pb.FetchRequest ) ( *pb.FetchResponse, error ) {
+	// Get sessions associated with user. 
+
+	var rsesssions []*pb.Session ; 
+	var sbuf  = pb.Session{} ; 
+	var session_status string  ; 
+	var session_type   string  ; 
+	var start_time     *string ; 
+	var end_time       *string ; 
+
+	
+	rows, err := storage.PSQL_Conn.Query(
+		ctx,
+		fmt.Sprintf(`
+			SELECT * FROM sessions 
+			WHERE '%v' = ANY(user_ids) 
+			OR guardian_id = '%v' ;
+		`,
+		req.Uuid,
+		req.Uuid ), 
+	)
+
+	if err != nil {
+		fmt.Println(err) ; 
+		return &pb.FetchResponse{ Sessions: []*pb.Session{},
+		ResponseMessage: "An error occued",
+	} , fmt.Errorf("An error occured while retreiving sessions"); 
+	}
+
+	tag , err := pgx.ForEachRow(rows, []any{ &sbuf.SessionId, &sbuf.GuardianId, &sbuf.UserId, &session_status, &session_type, &start_time , &end_time }, func() error {
+		sbuf.SessionStatus  = pb.Session_SessionStatus(pb.Session_SessionStatus_value[session_status]) ; 
+		sbuf.SessionType    = pb.Session_SessionType(pb.Session_SessionType_value[session_type]); 
+		sbuf.Duration       = &pb.Interval{
+			StartTime: util.NMutCast[string](start_time),
+			EndTime  : util.NMutCast[string](end_time),
+		}
+		rsesssions = append(rsesssions, &sbuf) ;  // Probably very expensive. cache cardinality of rows first beforehand. 
+		return nil ; 
+	})
+
+	if err != nil {
+		fmt.Println(err) ; 
+		return &pb.FetchResponse{ Sessions: []*pb.Session{},
+		ResponseMessage: "An error occued",
+	} , fmt.Errorf("An error occured while retreiving sessions"); 
+	}
+	
+	fmt.Println(tag.Select()) ;
+	return &pb.FetchResponse{ Sessions: rsesssions ,
+		ResponseMessage: "It worked!",
+	} , nil ; 
 }
 
 // func UpdateSession(req_buffer *CommitRequest , resp_buffer *CommitResponse) CommitStatus {

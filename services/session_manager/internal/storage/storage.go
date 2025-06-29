@@ -16,6 +16,11 @@ var       KAFKA_Writer    *kafka.Writer  = initializeKafkaWriter() ;
 var       KAFKA_Reader    *kafka.Reader  = initializeKafkaReader() ; 
 
 
+
+type    QueryBuilder   interface {
+	ToQuery(string) string ; 
+}
+
 /*
    @purpose:      Returns an instance of a PostgreSQL Client connection to be used
 	 								throughout the lifetime of the server. It utilizes the hosts environment 

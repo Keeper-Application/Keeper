@@ -7,14 +7,40 @@ import (
 	"time"
 
 	pb "github.com/keeper/services/notifications/gen/sessionpb"
-	storage "github.com/keeper/services/notifications/internal"
+	// storage "github.com/keeper/services/notifications/internal"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/protobuf/proto"
+	// "google.golang.org/protobuf/proto"
 )
 
 
-func BeginClient(port string) {
+func SendFetchTest( port string ) {
+	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to gRPC server: %v", err)
+	}
+	defer conn.Close() ; 
+	
+	client := pb.NewSessionManagerClient(conn) ; 
+	
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	fetch_req := &pb.FetchRequest{
+		Uuid: "826cf6e3-d09a-46f1-9e7c-9d7b3ef3e459",
+	}
+
+	x, err := client.FetchSessions(ctx, fetch_req) ; 
+
+	if err != nil {
+		log.Printf("Failed to get lock status: %v", err)
+	} else {
+		fmt.Printf("Fetch status response: %s\n", x.GetResponseMessage())
+		fmt.Printf("Sessions: %v\n", x.GetSessions())
+	}
+}
+
+func SendBeginTest(port string) {
 	// Create gRPC client connection
 	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -58,20 +84,27 @@ func BeginClient(port string) {
 
 func main() {
 
-	go func() {
-		w := storage.KAFKA_Reader ; 
-		for {
-			m, err := w.ReadMessage(context.Background()); 
-			if err != nil {
-				/* Write to shared msv buffer */ 
-			}
-			x := &pb.Session{} ; 
-			proto.Unmarshal(m.Value, x) ;
-			fmt.Printf("%+v\n\n", x) ;
-		}
-	}()
+	// go func() {
+	// 	w := storage.KAFKA_Reader ; 
+	// 	for {
+	// 		m, err := w.ReadMessage(context.Background()); 
+	// 		if err != nil {
+	// 			/* Write to shared msv buffer */ 
+	// 		}
+	// 		x := &pb.Session{} ; 
+	// 		proto.Unmarshal(m.Value, x) ;
+	// 		fmt.Printf("%+v\n\n", x) ;
+	// 	}
+	// }()
 
-  BeginClient("50051") ; 
+	// SendBeginTest("50051") ; 
+
+	fmt.Printf("\n\n\n")
+	fmt.Printf("\n\n\n")
+	fmt.Printf("\n\n\n")
+
+	SendFetchTest("50051") ; 
+
 	for {
 		;;
 	}

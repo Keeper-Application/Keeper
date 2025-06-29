@@ -249,8 +249,8 @@ func (CommitResponse_CommitStatus) EnumDescriptor() ([]byte, []int) {
 
 type Interval struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StartTime     float64                `protobuf:"fixed64,1,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       float64                `protobuf:"fixed64,2,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	StartTime     string                 `protobuf:"bytes,1,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	EndTime       string                 `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -285,18 +285,18 @@ func (*Interval) Descriptor() ([]byte, []int) {
 	return file_session_manager_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Interval) GetStartTime() float64 {
+func (x *Interval) GetStartTime() string {
 	if x != nil {
 		return x.StartTime
 	}
-	return 0
+	return ""
 }
 
-func (x *Interval) GetEndTime() float64 {
+func (x *Interval) GetEndTime() string {
 	if x != nil {
 		return x.EndTime
 	}
-	return 0
+	return ""
 }
 
 type Session struct {
@@ -548,11 +548,11 @@ func (x *FetchRequest) GetUuid() string {
 }
 
 type FetchResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	FetchResponse string                 `protobuf:"bytes,1,opt,name=fetch_response,json=fetchResponse,proto3" json:"fetch_response,omitempty"`
-	Sessions      []*Session             `protobuf:"bytes,2,rep,name=sessions,proto3" json:"sessions,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	ResponseMessage string                 `protobuf:"bytes,1,opt,name=response_message,json=responseMessage,proto3" json:"response_message,omitempty"`
+	Sessions        []*Session             `protobuf:"bytes,2,rep,name=sessions,proto3" json:"sessions,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *FetchResponse) Reset() {
@@ -585,9 +585,9 @@ func (*FetchResponse) Descriptor() ([]byte, []int) {
 	return file_session_manager_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *FetchResponse) GetFetchResponse() string {
+func (x *FetchResponse) GetResponseMessage() string {
 	if x != nil {
-		return x.FetchResponse
+		return x.ResponseMessage
 	}
 	return ""
 }
@@ -606,8 +606,8 @@ const file_session_manager_proto_rawDesc = "" +
 	"\x15session_manager.proto\"D\n" +
 	"\bInterval\x12\x1d\n" +
 	"\n" +
-	"start_time\x18\x01 \x01(\x01R\tstartTime\x12\x19\n" +
-	"\bend_time\x18\x02 \x01(\x01R\aendTime\"\x9e\x05\n" +
+	"start_time\x18\x01 \x01(\tR\tstartTime\x12\x19\n" +
+	"\bend_time\x18\x02 \x01(\tR\aendTime\"\x9e\x05\n" +
 	"\aSession\x12=\n" +
 	"\x0esession_status\x18\x01 \x01(\x0e2\x16.Session.SessionStatusR\rsessionStatus\x127\n" +
 	"\fsession_type\x18\x02 \x01(\x0e2\x14.Session.SessionTypeR\vsessionType\x12\x1d\n" +
@@ -653,9 +653,9 @@ const file_session_manager_proto_rawDesc = "" +
 	"\x06E_BUSY\x10\x05\x12\b\n" +
 	"\x04S_OK\x10\x06\"\"\n" +
 	"\fFetchRequest\x12\x12\n" +
-	"\x04uuid\x18\x01 \x01(\tR\x04uuid\"\\\n" +
-	"\rFetchResponse\x12%\n" +
-	"\x0efetch_response\x18\x01 \x01(\tR\rfetchResponse\x12$\n" +
+	"\x04uuid\x18\x01 \x01(\tR\x04uuid\"`\n" +
+	"\rFetchResponse\x12)\n" +
+	"\x10response_message\x18\x01 \x01(\tR\x0fresponseMessage\x12$\n" +
 	"\bsessions\x18\x02 \x03(\v2\b.SessionR\bsessions2\xe9\x02\n" +
 	"\x0eSessionManager\x120\n" +
 	"\rCreateSession\x12\x0e.CommitRequest\x1a\x0f.CommitResponse\x120\n" +
